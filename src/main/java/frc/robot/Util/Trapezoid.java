@@ -12,6 +12,7 @@ public class Trapezoid {
     private double targetVelocity;
     private double distanceLeft;
     private double time; /* need to add current velocity / MaxAccel */
+    /*// */
 
     public Trapezoid(double MaxAccel, double MaxVelocity, double distance, double targetVelocity){
         super();
