@@ -1,38 +1,57 @@
 package frc.robot.Util;
 import frc.robot.Constants;
 import frc.robot.subsystems.Chassis;
-import pabeles.concurrency.IntOperatorTask.Max;
+
 
 public class Trapezoid {
     Chassis chassis;
 
-    private double distance;
     private double MaxAccel;
     private double MaxVelocity;
-    private double targetVelocity;
-    private double distanceLeft;
-    private double time; /* need to add current velocity / MaxAccel */
-    /*// */
+    private double CurrentVelocity;
 
-    public Trapezoid(double MaxAccel, double MaxVelocity, double distance, double targetVelocity){
-        super();
+
+
+    public Trapezoid(double MaxAccel, double MaxVelocity){
         this.MaxAccel = MaxAccel;
         this.MaxVelocity = MaxVelocity;
-        this.distance = distance;
-        this.targetVelocity = targetVelocity;
-        double deltaV = MaxAccel * Constants.cycleTime;
-        double DistanceToStop = 0.5 * MaxAccel * time * time;
-
+        
     }
 
+   /* double distanceByCounts = distance * (Constants.countPerMeter) / 10 + firstDistance; */
+    double deltaV = MaxAccel * Constants.cycleTime;
 
-    public double accelDistance(){
-        double CurrentVelocity; 
-        double t = CurrentVelocity / MaxAccel;
-        return 0.5 * MaxAccel * t * t;
 
+
+
+    private double timeToDistance(){
+     return CurrentVelocity / MaxAccel;
     }
 
-    
+    public double calculate(double distanceLeft, double CurrentVelocity){
+        this.CurrentVelocity = CurrentVelocity;
+        
+        if(CurrentVelocity < MaxVelocity && distanceLeft > accelDistance()){
+            System.out.println("CALCULATED VELOCITY: " + (CurrentVelocity + deltaV));
+            System.out.println("Accel");
+            return CurrentVelocity + deltaV;
+  
 
+        } else if(CurrentVelocity == MaxVelocity) {
+            System.out.println("CALCULATED VELOCITY: " + CurrentVelocity);
+            System.out.println("keep");
+            return CurrentVelocity;
+        } else{
+            System.out.println("CALCULATED VELOCITY: " + (CurrentVelocity - deltaV));
+            System.out.println("DeAccel");
+            return CurrentVelocity - deltaV;
+        }
+    }
+
+    private double accelDistance(){
+        
+        return 0.5 * MaxAccel * timeToDistance() * timeToDistance();
+    }
 }
+
+

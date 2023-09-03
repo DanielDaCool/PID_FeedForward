@@ -17,6 +17,6 @@ public class RobotContainer {
   }
   public Command getAutonomousCommand() {
     
-    return new PidDrive(chassis).withTimeout(3);
+    return new PidDrive(chassis);
   }
 }
