@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DDFeedforwardVelocity;
-import frc.robot.Constants.feedForwardVelocity;
 import frc.robot.Constants.velocityPID;
 
 public class Chassis extends SubsystemBase {
@@ -30,7 +29,7 @@ public class Chassis extends SubsystemBase {
   SimpleMotorFeedforward SimplefeedForward = new SimpleMotorFeedforward(Constants.feedForwardVelocity.Ks, Constants.feedForwardVelocity.Kv, Constants.feedForwardVelocity.Ka);
   
 
-  DifferentialDriveFeedforward feedforward = new DifferentialDriveFeedforward(feedForwardVelocity.Kv, feedForwardVelocity.Ka, DDFeedforwardVelocity.Kva, DDFeedforwardVelocity.Kaa, Constants.widthWheels);
+  DifferentialDriveFeedforward feedforward = new DifferentialDriveFeedforward(DDFeedforwardVelocity.Kv, DDFeedforwardVelocity.Ka, DDFeedforwardVelocity.Kva, DDFeedforwardVelocity.Kaa, Constants.widthWheels);
 
 
   public Chassis() {
@@ -91,30 +90,29 @@ public class Chassis extends SubsystemBase {
 
 
   public void setVelocity(double leftVelocity, double rightVelocity){
-    System.out.println("Left: " + leftVelocity);
-    System.out.println("Right: " + rightVelocity);
+
     
 
     DifferentialDriveWheelVoltages volts = feedforward.calculate(getVelocityLeft(), leftVelocity, getVelocityRight(), rightVelocity, Constants.cycleTime);
 
-   /* double left = (leftVelocity * Constants.countPerMeter) / 10; */
+
+    double left = (leftVelocity * Constants.countPerMeter) / 10;
+    double right = (rightVelocity * Constants.countPerMeter) / 10;
     
-    motorRightFront.set(TalonFXControlMode.Velocity, rightVelocity ,DemandType.ArbitraryFeedForward, volts.right / 12);
-    motorLeftFront.set(TalonFXControlMode.Velocity, leftVelocity ,DemandType.ArbitraryFeedForward, volts.left / 12);
-    System.out.println("Volts Left: " + volts.left / 12);
-    System.out.println("Volts Right: " + volts.right / 12);
+    motorRightFront.set(TalonFXControlMode.Velocity, right ,DemandType.ArbitraryFeedForward, volts.right / 12);
+    motorLeftFront.set(TalonFXControlMode.Velocity, left ,DemandType.ArbitraryFeedForward, volts.left / 12);
   }
 
   public void setVelocity(double wantedVelocity) {
 
 
 
-    double v = (wantedVelocity * Constants.countPerMeter) / 10;
-    System.out.println("Wanted Velocity: " + wantedVelocity);
-    System.out.println("Calculated Feed Forward: " + SimplefeedForward.calculate(wantedVelocity));
+    // double v = (wantedVelocity * Constants.countPerMeter) / 10;
+    // System.out.println("Wanted Velocity: " + wantedVelocity);
+    // System.out.println("Calculated Feed Forward: " + SimplefeedForward.calculate(wantedVelocity));
 
-    motorRightFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
-    motorLeftFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
+    // motorRightFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
+    // motorLeftFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
   }
 
   public void setWantedVelocity(double wantedVelocity){

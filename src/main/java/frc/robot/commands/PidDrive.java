@@ -1,7 +1,6 @@
 package frc.robot.commands;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+
 import frc.robot.Util.Trapezoid;
 import frc.robot.subsystems.Chassis;
 
@@ -11,8 +10,7 @@ public class PidDrive extends CommandBase {
   double distance = 5;
   double remainingDistance;
   double CurrentVelocity;
-  double firstDistance;
-  Trapezoid trapezoidDrive = new Trapezoid(1, 2);
+  Trapezoid trapezoidDrive = new Trapezoid(2, 4);
   
 
   
@@ -20,15 +18,14 @@ public class PidDrive extends CommandBase {
   public PidDrive(Chassis chassis) {
     this.chassis = chassis;
     addRequirements(chassis);
-    firstDistance = chassis.getDistance();
 
   }
   
 
   @Override
   public void initialize() {
-    wantedVelocity = SmartDashboard.getNumber("Wanted Velocity", 0.5);
-    SmartDashboard.putNumber("Read Velocity", wantedVelocity);
+
+    distance = distance + chassis.getDistance();
 
 
    
@@ -39,14 +36,15 @@ public class PidDrive extends CommandBase {
   @Override
   public void execute() {
     CurrentVelocity = chassis.getVelocityRight();
-    remainingDistance = distance - chassis.getDistance() + firstDistance;
-    System.out.println("Remaining Distance: " + remainingDistance);
-    System.out.println("Current Velocity: " + CurrentVelocity);
+    System.out.println("VELOCITY: " + CurrentVelocity);
+    remainingDistance = distance - chassis.getDistance();
+    System.out.println("DISTANCE LEFT: " + remainingDistance);
 
 
 
-    chassis.setVelocity(trapezoidDrive.calculate(remainingDistance, CurrentVelocity), trapezoidDrive.calculate(remainingDistance, CurrentVelocity));
-    
+
+    //chassis.setVelocity(trapezoidDrive.calculate(remainingDistance, CurrentVelocity), trapezoidDrive.calculate(remainingDistance, CurrentVelocity));
+    chassis.setVelocity(trapezoidDrive.calculate(remainingDistance, CurrentVelocity, 0), trapezoidDrive.calculate(remainingDistance, CurrentVelocity, 0));
 
   }
 
