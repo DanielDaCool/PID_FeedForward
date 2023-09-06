@@ -51,7 +51,6 @@ public class Trapezoid {
     private double accelDistance(){
         
         return (MaxVelocity * MaxVelocity) / MaxAccel * 2;
-        /*return 0.5 * MaxAccel * timeToDistance() * timeToDistance(); */
     }
 }
 
