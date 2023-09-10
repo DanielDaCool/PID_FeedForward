@@ -8,7 +8,7 @@ public class Trapezoid {
 
     private double MaxAccel;
     private double MaxVelocity;
-
+//b;a
 
 
 
