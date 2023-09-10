@@ -99,11 +99,11 @@ public class Chassis extends SubsystemBase {
     double left = (leftVelocity * Constants.countPerMeter) / 10;
     double right = (rightVelocity * Constants.countPerMeter) / 10;
     
-    motorRightFront.set(TalonFXControlMode.Velocity, right ,DemandType.ArbitraryFeedForward, volts.right / 12);
-    motorLeftFront.set(TalonFXControlMode.Velocity, left ,DemandType.ArbitraryFeedForward, volts.left / 12);
+    motorRightFront.set(TalonFXControlMode.Velocity, right ,DemandType.ArbitraryFeedForward,(Constants.DDFeedforwardVelocity.Ks * Math.signum(right))  + volts.right / 12);
+    motorLeftFront.set(TalonFXControlMode.Velocity, left ,DemandType.ArbitraryFeedForward, (Constants.DDFeedforwardVelocity.Ks * Math.signum(left)) + volts.left / 12);
   }
 
-  public void setVelocity(double wantedVelocity) {
+//  public void setVelocity(double wantedVelocity) {
 
 
 
@@ -113,7 +113,7 @@ public class Chassis extends SubsystemBase {
 
     // motorRightFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
     // motorLeftFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
-  }
+//  } //
 
   public void setWantedVelocity(double wantedVelocity){
     this.wantedVelocity = wantedVelocity;

@@ -10,57 +10,43 @@ public class Trapezoid {
     private double MaxVelocity;
 
 
+
+
     public Trapezoid(double MaxAccel, double MaxVelocity){
         this.MaxAccel = MaxAccel;
         this.MaxVelocity = MaxVelocity;
     }
 
-   /* double distanceByCounts = distance * (Constants.countPerMeter) / 10 + firstDistance; */
-    
 
 
-    /*public double calculate(double distanceLeft, double CurrentVelocity){
-        deltaV = MaxAccel * Constants.cycleTime;
-        System.out.println("Current Calc Velocity: " + CurrentVelocity);
-        System.out.println("DISTANCE LEFT: " + distanceLeft);
-        System.out.println("DELTEV" + deltaV); */
+    public double calculate(double distanceLeft, double CurrentVelocity, double endV){
 
-        // if (firstTime == true){
-        //     firstTime = false;
-        //     return MaxAccel;
-        // }
-
-        // if (accelDistance() > distanceLeft) {
-        //     return CurrentVelocity - deltaV;
-        // } else if (CurrentVelocity > MaxVelocity) {
-        //     return CurrentVelocity;
-        // } else{
-        //     return CurrentVelocity + deltaV;
-        // }
-
-            public double calculate(double distanceLeft, double CurrentVelocity, double endV){
-                System.out.println("MAXVELO: " + MaxVelocity);
-                if((CurrentVelocity < MaxVelocity) && (distanceLeft > accelDistance())){
-                    System.out.println("ACCEL");
-
-                    return Math.min(CurrentVelocity + deltaV, MaxVelocity);
-                } else if(distanceLeft >= accelDistance()){
-                    return CurrentVelocity;
-                } else{
-                    return Math.max(CurrentVelocity - deltaV, endV);
-                }
-                
+            if (CurrentVelocity < 0.2){
+                return 0.2;
             }
+            if (accelDistance() > distanceLeft) {
+                System.out.println("DEACCEL");
+                return CurrentVelocity - deltaV;
 
+            } else if(CurrentVelocity >= MaxVelocity){
+                System.out.println("KEEP");
+                return MaxVelocity;
+            
+            } else{
+                System.out.println("ACCEL");
+                return CurrentVelocity + deltaV;
+            }
+        }
+
+        private double accelDistance(){
+            double t = MaxVelocity / MaxAccel;
+            double d1 = (0.5 * MaxAccel * t * t);
+            System.out.println("ACCEL DISTANCE: " + d1);
+            return d1;
+            
+            }
     
 
-    private double accelDistance(){
-        double t = MaxVelocity / MaxAccel;
-        double d1 = 0.5 * MaxAccel * t * t;
-        System.out.println("ACCEL DISTANCE: " + d1);
-        return d1;
-        
-        }
 }
 
 
