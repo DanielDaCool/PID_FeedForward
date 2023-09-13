@@ -10,7 +10,7 @@ public class PidDrive extends CommandBase {
   double distance = 7;
   double remainingDistance;
   double CurrentVelocity;
-  Trapezoid trapezoidDrive = new Trapezoid(1, 2);
+  Trapezoid trapezoidDrive = new Trapezoid(1.5, 2);
   
 
   

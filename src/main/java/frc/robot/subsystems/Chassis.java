@@ -96,11 +96,15 @@ public class Chassis extends SubsystemBase {
     DifferentialDriveWheelVoltages volts = feedforward.calculate(getVelocityLeft(), leftVelocity, getVelocityRight(), rightVelocity, Constants.cycleTime);
 
 
-    double left = (leftVelocity * Constants.countPerMeter) / 10;
-    double right = (rightVelocity * Constants.countPerMeter) / 10;
-    
+    double left = (volts.left * Constants.countPerMeter) / 10;
+    double right = (volts.left * Constants.countPerMeter) / 10;
+    /*
     motorRightFront.set(TalonFXControlMode.Velocity, right ,DemandType.ArbitraryFeedForward,(Constants.DDFeedforwardVelocity.Ks * Math.signum(right))  + (volts.right / 12));
     motorLeftFront.set(TalonFXControlMode.Velocity, left ,DemandType.ArbitraryFeedForward, (Constants.DDFeedforwardVelocity.Ks * Math.signum(left)) + (volts.left / 12));
+   */
+
+   motorRightFront.set(TalonFXControlMode.Velocity, right + (Constants.DDFeedforwardVelocity.Ks * Math.signum(right)));
+   motorLeftFront.set(TalonFXControlMode.Velocity, left + (Constants.DDFeedforwardVelocity.Ks * Math.signum(left))); 
   }
 
 //  public void setVelocity(double wantedVelocity) {

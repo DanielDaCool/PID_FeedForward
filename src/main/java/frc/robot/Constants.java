@@ -3,6 +3,7 @@
 package frc.robot;
 
 public final class Constants {
+  private static double voltsPerMeter = 0.417;
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
@@ -25,17 +26,18 @@ public final class Constants {
     public static final double Ks = 0.0061182;
     public static final double Kv = 0.64538;
     public static final double Ka = 0.024367;
+
   }
 
   public static class DDFeedforwardVelocity{
 
     
     public static final double Kp = (0.417 * 1023) / (12 * countPerMeter);
-    public static final double Kv = 2.84;
-    public static final double Ka = 0.12;
-    public static final double Ks = 0.35;
-    public static final double Kva = 2.85;
-    public static final double Kaa = 0.055;
+    public static final double Kv = 2.84 * voltsPerMeter;
+    public static final double Ka = 0.12 * voltsPerMeter;
+    public static final double Ks = 0.335 * voltsPerMeter;
+    public static final double Kva = 2.85 * voltsPerMeter;
+    public static final double Kaa = 0.055 * voltsPerMeter;
   }
   }
 

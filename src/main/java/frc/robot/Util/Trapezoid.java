@@ -1,4 +1,5 @@
 package frc.robot.Util;
+import frc.robot.Constants;
 import frc.robot.subsystems.Chassis;
 
 
@@ -14,13 +15,14 @@ public class Trapezoid {
     public Trapezoid(double MaxAccel, double MaxVelocity){
         this.MaxAccel = MaxAccel;
         this.MaxVelocity = MaxVelocity;
+        deltaV = MaxAccel * Constants.cycleTime;
     }
 
 
 
     public double calculate(double distanceLeft, double CurrentVelocity, double endV){
 
-
+        
 
         if (accelDistance() > distanceLeft) {
             System.out.println("DEACCEL");
@@ -42,7 +44,7 @@ public class Trapezoid {
         private double accelDistance(){
             double t = MaxVelocity / MaxAccel;
             double d1 = (0.5 * MaxAccel * t * t);
-            System.out.println("ACCEL DISTANCE: " + d1);
+            
             return d1;
             
             }
