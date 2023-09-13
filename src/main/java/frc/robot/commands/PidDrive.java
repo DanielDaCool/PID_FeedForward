@@ -7,7 +7,7 @@ import frc.robot.subsystems.Chassis;
 public class PidDrive extends CommandBase {
   Chassis chassis;
   double wantedVelocity;
-  double distance = 5;
+  double distance = 7;
   double remainingDistance;
   double CurrentVelocity;
   Trapezoid trapezoidDrive = new Trapezoid(1, 2);

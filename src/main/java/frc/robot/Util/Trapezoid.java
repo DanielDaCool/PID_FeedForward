@@ -8,7 +8,6 @@ public class Trapezoid {
 
     private double MaxAccel;
     private double MaxVelocity;
-//b;a
 
 
 
@@ -21,22 +20,24 @@ public class Trapezoid {
 
     public double calculate(double distanceLeft, double CurrentVelocity, double endV){
 
-            if (CurrentVelocity < 0.2){
-                return 0.2;
-            }
-            if (accelDistance() > distanceLeft) {
-                System.out.println("DEACCEL");
-                return CurrentVelocity - deltaV;
 
-            } else if(CurrentVelocity >= MaxVelocity){
-                System.out.println("KEEP");
-                return MaxVelocity;
-            
-            } else{
-                System.out.println("ACCEL");
-                return CurrentVelocity + deltaV;
-            }
+
+        if (accelDistance() > distanceLeft) {
+            System.out.println("DEACCEL");
+            return CurrentVelocity - deltaV;
+        } 
+        if (CurrentVelocity < 0.2){
+            return 0.2 + deltaV;
         }
+        else if(CurrentVelocity >= MaxVelocity){
+            System.out.println("KEEP");
+            return MaxVelocity;
+            
+        } else{
+            System.out.println("ACCEL");
+            return CurrentVelocity + deltaV;
+        }
+    }
 
         private double accelDistance(){
             double t = MaxVelocity / MaxAccel;
