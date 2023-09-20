@@ -22,15 +22,12 @@ public class Trapezoid {
 
     public double calculate(double distanceLeft, double CurrentVelocity, double endV){
 
-        
+        System.out.println("DISTANCE LEFT: " + distanceLeft);
 
         if (accelDistance() > distanceLeft) {
             System.out.println("DEACCEL");
             return CurrentVelocity - deltaV;
         } 
-        if (CurrentVelocity < 0.2){
-            return 0.2 + deltaV;
-        }
         else if(CurrentVelocity >= MaxVelocity){
             System.out.println("KEEP");
             return MaxVelocity;

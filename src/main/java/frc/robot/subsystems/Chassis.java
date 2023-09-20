@@ -1,14 +1,15 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.PigeonIMU;
-
 import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -48,7 +49,10 @@ public class Chassis extends SubsystemBase {
     motorRightBack.setInverted(true);
     motorLeftBack.setInverted(false);
     motorLeftFront.setInverted(false);
-    
+
+ //   pose = new Pose2d(0, 0, getAngle());    
+
+
 
     motorRightFront.config_kP(0, velocityPID.velocityKP);
     motorLeftFront.config_kP(0, velocityPID.velocityKP);
@@ -75,9 +79,13 @@ public class Chassis extends SubsystemBase {
     gyro.setFusedHeading(0);
   }
 
-  public double getAngle() {
+  public double getAngle(){
     return gyro.getFusedHeading();
   }
+
+ // public Rotation2d getAngle() {
+   // return Rotation2d.fromDegrees(gyro.getFusedHeading());
+  //} 
 
   public double getVelocityRight() {
     return (motorRightFront.getSelectedSensorVelocity() / Constants.countPerMeter) * 10;
@@ -183,6 +191,7 @@ public class Chassis extends SubsystemBase {
 
   @Override
   public void periodic() {
+
 
   }
 }

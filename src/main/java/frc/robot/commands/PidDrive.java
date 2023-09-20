@@ -10,7 +10,7 @@ public class PidDrive extends CommandBase {
   double distance = 7;
   double remainingDistance;
   double CurrentVelocity;
-  Trapezoid trapezoidDrive = new Trapezoid(1.5, 2);
+  Trapezoid trapezoidDrive = new Trapezoid(0.5, 2);
   
 
   
@@ -37,6 +37,7 @@ public class PidDrive extends CommandBase {
   public void execute() {
     CurrentVelocity = chassis.getVelocityRight();
     remainingDistance = distance - chassis.getDistance();
+    
 
 
     //chassis.setVelocity(trapezoidDrive.calculate(remainingDistance, CurrentVelocity), trapezoidDrive.calculate(remainingDistance, CurrentVelocity));
