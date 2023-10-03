@@ -60,6 +60,7 @@ public class Chassis extends SubsystemBase {
 
     kinematics = new DifferentialDriveKinematics(trackWidth);
     pose = new Pose2d(0,0, getAngle());
+    
     poseEstimator = new DifferentialDrivePoseEstimator(kinematics, getAngle(), getLeftDistance(), getRightDistance(), pose);
     fieldPosition = new Field2d();
     fieldPosition.setRobotPose(pose);
@@ -82,6 +83,9 @@ public class Chassis extends SubsystemBase {
 
 
   }
+
+
+  
 
 
 
