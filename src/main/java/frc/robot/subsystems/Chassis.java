@@ -7,14 +7,16 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.controller.DifferentialDriveFeedforward;
 import edu.wpi.first.math.controller.DifferentialDriveWheelVoltages;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import static frc.robot.Constants.*;
 import frc.robot.Constants.DDFeedforwardVelocity;
 import frc.robot.Constants.velocityPID;
 
@@ -27,19 +29,23 @@ public class Chassis extends SubsystemBase {
   private PigeonIMU gyro = new PigeonIMU(14);
   public double velocity;
 
-  SimpleMotorFeedforward SimplefeedForward = new SimpleMotorFeedforward(Constants.feedForwardVelocity.Ks, Constants.feedForwardVelocity.Kv, Constants.feedForwardVelocity.Ka);
+  DifferentialDriveKinematics kinematics;
+  DifferentialDrivePoseEstimator poseEstimator;
+  Field2d fieldPosition;
+  Pose2d pose;
+
   
 
-  DifferentialDriveFeedforward feedforward = new DifferentialDriveFeedforward(DDFeedforwardVelocity.Kv, DDFeedforwardVelocity.Ka, DDFeedforwardVelocity.Kva, DDFeedforwardVelocity.Kaa, Constants.widthWheels);
+  DifferentialDriveFeedforward feedforward = new DifferentialDriveFeedforward(DDFeedforwardVelocity.Kv, DDFeedforwardVelocity.Ka, DDFeedforwardVelocity.Kva, DDFeedforwardVelocity.Kaa, trackWidth);
 
 
   public Chassis() {
     super();
 
-    motorRightFront = new TalonFX(Constants.rightFrontMotorId);
-    motorRightBack = new TalonFX(Constants.rightBackMotorId);
-    motorLeftFront = new TalonFX(Constants.leftFrotnMotorId);
-    motorLeftBack = new TalonFX(Constants.leftBackMotorId);
+    motorRightFront = new TalonFX(rightFrontMotorId);
+    motorRightBack = new TalonFX(rightBackMotorId);
+    motorLeftFront = new TalonFX(leftFrotnMotorId);
+    motorLeftBack = new TalonFX(leftBackMotorId);
 
     motorLeftBack.follow(motorLeftFront);
     motorRightBack.follow(motorRightFront);
@@ -50,49 +56,68 @@ public class Chassis extends SubsystemBase {
     motorLeftBack.setInverted(false);
     motorLeftFront.setInverted(false);
 
- //   pose = new Pose2d(0, 0, getAngle());    
+
+
+    kinematics = new DifferentialDriveKinematics(trackWidth);
+    pose = new Pose2d(0,0, getAngle());
+    poseEstimator = new DifferentialDrivePoseEstimator(kinematics, getAngle(), getLeftDistance(), getRightDistance(), pose);
+    fieldPosition = new Field2d();
+    fieldPosition.setRobotPose(pose);
+    SmartDashboard.putData("Positin",fieldPosition); 
+
+
 
 
 
     motorRightFront.config_kP(0, velocityPID.velocityKP);
     motorLeftFront.config_kP(0, velocityPID.velocityKP);
-    SmartDashboard.putData(this);
-    /*
-     * motorRightFront.config_kI(0, velocityPID.velocityKI);
-     * motorLeftFront.config_kI(0, velocityPID.velocityKI);
-     * motorRightFront.config_kD(0, velocityPID.velocityKD);
-     * motorLeftFront.config_kD(0, velocityPID.velocityKD);
-     */
+
 
   }
 
-  public double getCounts() {
-    return motorRightFront.getSelectedSensorPosition();
+
+  public void setPostion(double x, double y, double angle){
+    poseEstimator.resetPosition(getAngle(), getLeftDistance(), getRightDistance(), new Pose2d(x, y, Rotation2d.fromDegrees(angle)));
+
+
+
   }
+
+
+
+
 
   public void stop() {
     motorRightFront.set(ControlMode.PercentOutput, 0);
     motorLeftFront.set(ControlMode.PercentOutput, 0);
   }
 
+
+  public double getLeftDistance(){
+    return motorLeftFront.getSelectedSensorPosition() * countPerMeter; 
+  }
+
+  public double getRightDistance(){
+    return motorRightFront.getSelectedSensorPosition() * countPerMeter; 
+  }
+
+
   public void resetAngle() {
     gyro.setFusedHeading(0);
   }
 
-  public double getAngle(){
-    return gyro.getFusedHeading();
+  public Rotation2d getAngle(){
+    return Rotation2d.fromDegrees(gyro.getFusedHeading());
   }
 
- // public Rotation2d getAngle() {
-   // return Rotation2d.fromDegrees(gyro.getFusedHeading());
-  //} 
+
 
   public double getVelocityRight() {
-    return (motorRightFront.getSelectedSensorVelocity() / Constants.countPerMeter) * 10;
+    return (motorRightFront.getSelectedSensorVelocity() / countPerMeter) * 10;
   }
   
   public double getVelocityLeft() {
-    return (motorLeftFront.getSelectedSensorVelocity() / Constants.countPerMeter) * 10;
+    return (motorLeftFront.getSelectedSensorVelocity() / countPerMeter) * 10;
   }
 
 
@@ -101,43 +126,26 @@ public class Chassis extends SubsystemBase {
 
     
 
-    DifferentialDriveWheelVoltages volts = feedforward.calculate(getVelocityLeft(), leftVelocity, getVelocityRight(), rightVelocity, Constants.cycleTime);
+    DifferentialDriveWheelVoltages volts = feedforward.calculate(getVelocityLeft(), leftVelocity, getVelocityRight(), rightVelocity, cycleTime);
 
 
-    double left = (volts.left * Constants.countPerMeter) / 10;
-    double right = (volts.left * Constants.countPerMeter) / 10;
-    /*
-    motorRightFront.set(TalonFXControlMode.Velocity, right ,DemandType.ArbitraryFeedForward,(Constants.DDFeedforwardVelocity.Ks * Math.signum(right))  + (volts.right / 12));
-    motorLeftFront.set(TalonFXControlMode.Velocity, left ,DemandType.ArbitraryFeedForward, (Constants.DDFeedforwardVelocity.Ks * Math.signum(left)) + (volts.left / 12));
-   */
+    double left = (volts.left * countPerMeter) / 10;
+    double right = (volts.left * countPerMeter) / 10;
 
-   motorRightFront.set(TalonFXControlMode.Velocity, right + (Constants.DDFeedforwardVelocity.Ks * Math.signum(right)));
-   motorLeftFront.set(TalonFXControlMode.Velocity, left + (Constants.DDFeedforwardVelocity.Ks * Math.signum(left))); 
+
+   motorRightFront.set(TalonFXControlMode.Velocity, right + (DDFeedforwardVelocity.Ks * Math.signum(right)));
+   motorLeftFront.set(TalonFXControlMode.Velocity, left + (DDFeedforwardVelocity.Ks * Math.signum(left))); 
   }
 
-//  public void setVelocity(double wantedVelocity) {
 
-
-
-    // double v = (wantedVelocity * Constants.countPerMeter) / 10;
-    // System.out.println("Wanted Velocity: " + wantedVelocity);
-    // System.out.println("Calculated Feed Forward: " + SimplefeedForward.calculate(wantedVelocity));
-
-    // motorRightFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
-    // motorLeftFront.set(TalonFXControlMode.Velocity, v ,DemandType.ArbitraryFeedForward, SimplefeedForward.calculate(wantedVelocity) / 12);
-//  } //
-
-  public void setWantedVelocity(double wantedVelocity){
-    this.wantedVelocity = wantedVelocity;
-  }
 
   public double getPositionRight() {
-    return motorRightFront.getSelectedSensorPosition() / Constants.countPerMeter;
+    return motorRightFront.getSelectedSensorPosition() / countPerMeter;
 
   }
 
   public double getPositionLeft() {
-    return motorLeftFront.getSelectedSensorPosition() / Constants.countPerMeter;
+    return motorLeftFront.getSelectedSensorPosition() / countPerMeter;
   }
 
   public double getPowerRight() {
@@ -148,9 +156,6 @@ public class Chassis extends SubsystemBase {
     return motorLeftFront.getMotorOutputPercent();
   }
 
-  public double getDistance(){
-    return getCounts() / Constants.countPerMeter * 10;
-  }
 
   public void setBreak() {
     motorRightFront.setNeutralMode(NeutralMode.Brake);
@@ -190,7 +195,11 @@ public class Chassis extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
+  public void periodic() {  
+    super.periodic();
+    poseEstimator.update(getAngle(), getLeftDistance(), getRightDistance());
+    pose = poseEstimator.getEstimatedPosition();
+    fieldPosition.setRobotPose(pose);
 
 
   }

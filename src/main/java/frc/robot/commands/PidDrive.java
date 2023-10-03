@@ -25,7 +25,7 @@ public class PidDrive extends CommandBase {
   @Override
   public void initialize() {
 
-    distance = distance + chassis.getDistance();
+    distance = distance + chassis.getLeftDistance();
 
 
    
@@ -36,7 +36,7 @@ public class PidDrive extends CommandBase {
   @Override
   public void execute() {
     CurrentVelocity = chassis.getVelocityRight();
-    remainingDistance = distance - chassis.getDistance();
+    remainingDistance = distance - chassis.getLeftDistance();
     
 
 

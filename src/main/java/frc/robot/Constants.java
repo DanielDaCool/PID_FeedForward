@@ -14,7 +14,7 @@ public final class Constants {
   public static final int leftBackMotorId = 4;
   public static final double countPerMeter = 51330.6021;
 
-  public static final double widthWheels = 0.58;
+  public static final double trackWidth = 0.58;
   public static final double cycleTime = 0.02;
 
   public static class velocityPID{
