@@ -38,13 +38,11 @@ public class Trapezoid {
         }
     }
 
-        private double accelDistance(){
-            double t = MaxVelocity / MaxAccel;
-            double d1 = (0.5 * MaxAccel * t * t);
-            
-            return d1;
-            
-            }
+    private double accelDistance(){
+        double t = MaxVelocity / MaxAccel;
+        double d1 = (0.5 * MaxAccel * t * t);    
+        return d1;    
+    }
     
 
 }

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -10,7 +11,9 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.DifferentialDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,10 +32,9 @@ public class Chassis extends SubsystemBase {
   private PigeonIMU gyro = new PigeonIMU(14);
   public double velocity;
 
-  DifferentialDriveKinematics kinematics;
-  DifferentialDrivePoseEstimator poseEstimator;
+  private DifferentialDriveKinematics kinematics;
+  private DifferentialDrivePoseEstimator poseEstimator;
   Field2d fieldPosition;
-  Pose2d pose;
 
   
 
@@ -58,12 +60,9 @@ public class Chassis extends SubsystemBase {
 
 
 
-    kinematics = new DifferentialDriveKinematics(trackWidth);
-    pose = new Pose2d(0,0, getAngle());
-    
-    poseEstimator = new DifferentialDrivePoseEstimator(kinematics, getAngle(), getLeftDistance(), getRightDistance(), pose);
+    kinematics = new DifferentialDriveKinematics(trackWidth /*enter TW*/);
+    poseEstimator = new DifferentialDrivePoseEstimator(kinematics, getAngle(), getLeftDistance(), getRightDistance(), new Pose2d());
     fieldPosition = new Field2d();
-    fieldPosition.setRobotPose(pose);
     SmartDashboard.putData("Positin",fieldPosition); 
 
 
@@ -86,7 +85,9 @@ public class Chassis extends SubsystemBase {
 
 
   
-
+  public Pose2d getPose(){
+    return poseEstimator.getEstimatedPosition();
+  }
 
 
 
@@ -97,14 +98,13 @@ public class Chassis extends SubsystemBase {
   }
 
 
+
   public double getLeftDistance(){
-    return motorLeftFront.getSelectedSensorPosition() * countPerMeter; 
+    return motorLeftFront.getSelectedSensorPosition() / countPerMeter;
   }
-
   public double getRightDistance(){
-    return motorRightFront.getSelectedSensorPosition() * countPerMeter; 
+    return motorRightFront.getSelectedSensorPosition() / countPerMeter;
   }
-
 
   public void resetAngle() {
     gyro.setFusedHeading(0);
@@ -124,22 +124,17 @@ public class Chassis extends SubsystemBase {
     return (motorLeftFront.getSelectedSensorVelocity() / countPerMeter) * 10;
   }
 
+  public void setVelocity (ChassisSpeeds speed){
+    DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(speed);
 
-
-  public void setVelocity(double leftVelocity, double rightVelocity){
-
+    DifferentialDriveWheelVoltages volts = feedforward.calculate(getVelocityLeft(), wheelSpeeds.leftMetersPerSecond , getVelocityRight(), wheelSpeeds.rightMetersPerSecond, cycleTime);
+    double right = (wheelSpeeds.rightMetersPerSecond * countPerMeter) / 10;
+    double left = (wheelSpeeds.leftMetersPerSecond * countPerMeter) / 10;
     
-
-    DifferentialDriveWheelVoltages volts = feedforward.calculate(getVelocityLeft(), leftVelocity, getVelocityRight(), rightVelocity, cycleTime);
-
-
-    double left = (volts.left * countPerMeter) / 10;
-    double right = (volts.left * countPerMeter) / 10;
-
-
-   motorRightFront.set(TalonFXControlMode.Velocity, right + (DDFeedforwardVelocity.Ks * Math.signum(right)));
-   motorLeftFront.set(TalonFXControlMode.Velocity, left + (DDFeedforwardVelocity.Ks * Math.signum(left))); 
+    motorRightFront.set(ControlMode.Velocity, right, DemandType.ArbitraryFeedForward, volts.right);
+    motorLeftFront.set(ControlMode.Velocity, left, DemandType.ArbitraryFeedForward, volts.left);
   }
+
 
 
 
@@ -202,9 +197,7 @@ public class Chassis extends SubsystemBase {
   public void periodic() {  
     super.periodic();
     poseEstimator.update(getAngle(), getLeftDistance(), getRightDistance());
-    pose = poseEstimator.getEstimatedPosition();
-    fieldPosition.setRobotPose(pose);
-
-
+    fieldPosition.setRobotPose(poseEstimator.getEstimatedPosition());
+    fieldPosition.setRobotPose(poseEstimator.getEstimatedPosition());
   }
 }

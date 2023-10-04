@@ -16,6 +16,7 @@ public final class Constants {
 
   public static final double trackWidth = 0.58;
   public static final double cycleTime = 0.02;
+  public static final double degreesPerSecond = 270;
 
   public static class velocityPID{
     public static final double velocityKP = 0.07;
