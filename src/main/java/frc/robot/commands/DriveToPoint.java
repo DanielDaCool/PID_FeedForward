@@ -24,7 +24,8 @@ public class DriveToPoint extends CommandBase {
   double wantedAccel = 1;
   Pose2d pose = new Pose2d();
   Translation2d translationFinal = new Translation2d();
-  Trapezoid trapezoid = new Trapezoid(wantedAccel, maxVelocity);
+  Trapezoid driveTrapezoid = new Trapezoid(wantedAccel, maxVelocity);
+  Trapezoid rotationTrapezoid = new Trapezoid(degreesPerSecond, 180);
 
 
   public DriveToPoint(Chassis chassis) {
@@ -63,7 +64,8 @@ public class DriveToPoint extends CommandBase {
       Translation2d vector = translationFinal.minus(pose.getTranslation());
       double angleError = vector.getAngle().minus(pose.getRotation()).getDegrees();
       remainingDistance = vector.getNorm();
-      ChassisSpeeds chassisSpeeds = new ChassisSpeeds(trapezoid.calculate(remainingDistance, chassis.getVelocityRight(), 0), 0, trapezoid.calculate(angleError, chassis.getVelocityLeft(), 0));
+      double velocity = driveTrapezoid.calculate(remainingDistance, chassis.getVelocityRight(), 0);
+      ChassisSpeeds chassisSpeeds = new ChassisSpeeds(velocity, 0, Math.toRadians(wantedAngle.minus(pose.getRotation()).getDegrees()));
 
       chassis.setVelocity(chassisSpeeds);
 
@@ -72,7 +74,7 @@ public class DriveToPoint extends CommandBase {
     else{
       double angleError = wantedAngle.minus(pose.getRotation()).getDegrees();
       System.out.println("ANGLE ERROR: " + angleError);
-      ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, Math.toRadians(angleError * degreesPerSecond * 0.07));
+      ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, Math.toRadians(driveTrapezoid.calculate(angleError, chassis.getVelocityLeft(), 0)));
       chassis.setVelocity(chassisSpeeds);
     }
   }
